@@ -1,42 +1,33 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerLook : MonoBehaviour
 {
-    private PlayerController playerControls;
-    private float xRot = 0f;
+    private PlayerController lookControl;
 
-    private void Awake()
+    void Awake()
     {
-        playerControls = new PlayerController();
+        lookControl = new PlayerController();
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    void OnEnable()
+    {
+        lookControl.Enable();
+    }
+
+    void OnDisable()
+    {
+        lookControl.Disable();
+    }
     void Start()
     {
-
+        
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        Vector2 look = playerControls.Player.Look.ReadValue<Vector2>();
-        float mouseX = look.x;
-        float mouseY = look.y;
-
-        xRot -= mouseY;
-        xRot = Mathf.Clamp(xRot, -90f, 90f);
-
-        transform.localRotation = Quaternion.Euler(xRot, 0, 0);
-        transform.Rotate(Vector3.up * mouseX);
-    }
-    
-    private void OnEnable()
-    {
-        playerControls.Enable();
-    }
-
-    private void OnDisable()
-    {
-        playerControls.Disable();
+    void LateUpdate()
+    { 
+        Vector2 look = lookControl.Player.Look.ReadValue<Vector2>();
+        float lookX = look.x;
+        float lookY = look.y;
+        Debug.Log(look);
     }
 }

@@ -7,11 +7,19 @@ public class PlayerMovement : MonoBehaviour
 {
     private PlayerController playerControls;
     public float moveSpeed = 5f;
-    public Camera cam;
+    public Transform camTransform;
 
     private void Awake()
     {
         playerControls = new PlayerController();
+    }
+
+    void Start()
+    {
+        if (camTransform == null)
+        {
+            camTransform = Camera.main.transform;
+        }
     }
 
     private void OnEnable()
@@ -24,20 +32,27 @@ public class PlayerMovement : MonoBehaviour
         playerControls.Disable();
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        Vector2 move = playerControls.Player.Move.ReadValue<Vector2>();
-        Vector3 forward = cam.transform.forward;
-        
-        forward.y = 0f;
-        Vector3 right = cam.transform.right;
-        Debug.Log(right);
-        right.y = 0f;
-        forward.Normalize();
-        right.Normalize();
-        Vector3 movement = new Vector3(move.x*forward.x, 0, move.y * right.x) * moveSpeed * Time.fixedDeltaTime;
+        camRelativeMovement();
+    }
 
-        transform.position = transform.position + movement;
+    void camRelativeMovement()
+    { 
+        Vector2 move = playerControls.Player.Move.ReadValue<Vector2>();
+        float vert = move.y / moveSpeed;
+        float horiz = move.x / moveSpeed;
+
+        Vector3 forward = camTransform.forward;
+        Vector3 right = camTransform.right;
+        forward.y = 0;
+        right.y = 0;
+
+        Vector3 forwardRelative = vert * forward;
+        Vector3 rightRelative = horiz * right;
+
+        Vector3 camRelative = forwardRelative + rightRelative;
+        this.transform.Translate(camRelative, Space.World);
     }
 
 
