@@ -36,7 +36,7 @@ public class PlayerLook : MonoBehaviour
         Vector2 look = lookControl.Player.Look.ReadValue<Vector2>();
         float lookX = look.x;
         float lookY = look.y;
-        Debug.Log(look);
+
         const float Min_X = 0f;
         const float Max_X = 360f;
         const float Min_Y = -90f;
