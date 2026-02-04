@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
 
+
 public class PlayerMovement : MonoBehaviour
 {
     private PlayerController playerControls;
@@ -16,10 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        if (camTransform == null)
-        {
-            camTransform = Camera.main.transform;
-        }
+        camTransform ??= Camera.main.transform;
     }
 
     private void OnEnable()

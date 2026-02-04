@@ -3,23 +3,19 @@ using UnityEngine;
 public class PlayerLook : MonoBehaviour
 {
     private PlayerController lookControl;
-    [SerializeField]
-    private Camera cam;
-    private float X;
-    private float Y;
-    public float Sensitivity;
+    [SerializeField] private Camera cam;
+    private float pitch;
+    private float yaw;
+    public float Sensitivity = 75f;
+    private bool firstLook = true;
 
     void Awake()
     {
         lookControl = new PlayerController();
-        Vector3 euler = transform.rotation.eulerAngles;
-        X = euler.x;
-        Y = euler.y + 90;
-    }
-
-    void OnEnable()
-    {
-        lookControl.Enable();
+        
+        
+        yaw = transform.eulerAngles.y;
+        pitch = 0f;
     }
 
     void OnDisable()
@@ -29,27 +25,32 @@ public class PlayerLook : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        lookControl.Enable();
+
+        transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+        cam.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
     void LateUpdate()
     {
         Vector2 look = lookControl.Player.Look.ReadValue<Vector2>();
-        float lookX = look.x;
-        float lookY = look.y;
 
-        const float Min_X = 0f;
-        const float Max_X = 360f;
-        const float Min_Y = -90f;
-        const float Max_Y = 90f;
+        if (firstLook)
+        {
+            if (look.sqrMagnitude > 0f)
+            {
+                firstLook = false;
+            }
+            return;
+        }
 
-        X += lookX * (Sensitivity * Time.deltaTime);
-        if (X < Min_X) X += Max_X;
-        else if (X > Max_X) X -= Max_X;
-        Y -= lookY * (Sensitivity * Time.deltaTime);
-        if (Y <= Min_Y) Y = Min_Y;
-        else if (Y >= Max_Y) Y = Max_Y;
+        yaw += look.x * Sensitivity * Time.deltaTime;
+        pitch -= look.y * Sensitivity * Time.deltaTime;
+        pitch = Mathf.Clamp(pitch, -90f, 90f);
 
-        cam.transform.rotation = Quaternion.Euler(Y, X, 0f);
+        transform.rotation = Quaternion.Euler(0f,yaw,0f);
+        cam.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+
         if (lookControl.UI.Escape.ReadValue<float>() == 1) Cursor.lockState = CursorLockMode.None;
     }
 }
